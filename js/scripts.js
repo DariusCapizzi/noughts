@@ -83,11 +83,12 @@ function start(){
 
 // ui
 $(function(){
-
   //newgame (constructor), clear html fields
 
   var newGame = new Game();
+
   $("td").text("");
+
   $(".out").text("it is " + newGame.turn +"'s turn");
 
   $("td").click(function() {
@@ -100,9 +101,9 @@ $(function(){
     }
 
     // log board
-    console.log(newGame.board[0]);
-    console.log(newGame.board[1]);
-    console.log(newGame.board[2]);
+    // console.log(newGame.board[0]);
+    // console.log(newGame.board[1]);
+    // console.log(newGame.board[2]);
 
 
     //test winner
@@ -127,5 +128,28 @@ $(function(){
   $("#new").click(function() {
     newGame = new Game();
     $("td").text("");
-    $(".out").text("it is " + newGame.turn +"'s turn");  })
-})
+    $(".out").text("it is " + newGame.turn +"'s turn");
+  });
+
+
+  $("#old").click(function() {
+    var oldGame = newGame;
+    $(".saved-games").append("<p class='old-game'>" + oldGame.board.join("") + "</p>");
+
+    $(".old-game").last().click(function() {
+      newGame = oldGame;
+      syncBoard(newGame.board);
+    });
+  });
+
+});
+
+function syncBoard(array) {
+
+  for (var r = 0; r<array.length; r++){
+    for (var c = 0; c<array[0].length; c++ ){
+      $("tr." + c + " td." + r).text(array[c][r]);
+    }
+  }
+
+}

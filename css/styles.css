@@ -3,12 +3,23 @@ td {
   height: 100px;
   border: 1px dashed black;
   text-align: center;
-
+  font-size: 60px;
 }
-
+table{
+  margin: auto;
+}
 .out {
   text-align: right;
   float: right;
   color: pink;
   font-size: 100px;
+}
+
+#new {
+  margin: 24px;
+  font-size: 30px;
+}
+
+div {
+  text-align: center;
 }
