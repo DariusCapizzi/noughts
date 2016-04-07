@@ -1,27 +1,61 @@
 //business logic
-function Game() {
+function Game(player) {
   this.board = [["","",""], ["","",""], ["","",""]];
   this.turn = "x";
+  this.players = player;
+  this.nameOfGame = "";
+  this.winner = "";
 
+  // function change player, make computer move
+  this.changePlayer = function(){
+    if (this.players === 2) {
+      if(this.turn === "x") {
+        this.turn = "o";
+      } else { this.turn = "x"; }
+    } else {
+      //Computer logic -random
+      while(!this.testWinner()) {
+        var row = Math.floor(Math.random() * this.board.length);
+        var col = Math.floor(Math.random() * this.board[0].length);
+        console.log(row);
+        if (!this.board[row][col]) {
+          this.board[row][col] = "o";
+          return;
+        }
+      }
+      //for each row
 
-  // function change player
-  this.changeplayer = function(){
-    if(this.turn === "x") {
-      this.turn = "o";
-    } else { this.turn = "x"; }
+      // for (var i=0;i<this.board.length;i++){
+      //   //for each column in that row
+      //   for (var k = 0 ; k<this.board[0].length; k++){
+      //     var randNumber = Math.random
+      //     if (!this.board[i][k]) {
+      //       this.board[i][k] = "o";
+      //       return;
+      //     }
+      //   }
+      //
+      // }
+
+    }
   }
 
   //function test winner
   this.testWinner = function(){
 
+    //if someone already won
+    if (this.winner) {
+      return this.winner;
+    }
+
     //check rows
     for (var i=0; i<this.board[0].length; i++){
       if (this.board[i].join("") === "xxx"){
         // console.log("X wins!")
-        return "x"
+        this.winner = "x"
       } else if (this.board[i].join("") === "ooo"){
         // console.log("O wins!")
-        return "o"
+        this.winner = "o"
       }
     }
 
@@ -38,10 +72,10 @@ function Game() {
       // test win
       if (column === "xxx"){
         // console.log("X wins column!")
-        return "x"
+        this.winner = "x"
       } else if (column === "ooo"){
         // console.log("O wins column!")
-        return "o"
+        this.winner = "o"
       }
     }
 
@@ -51,14 +85,14 @@ function Game() {
       ( (this.board[0][0] === this.board[1][1] && this.board[1][1] === this.board[2][2]) ||
       (this.board[0][2] === this.board[1][1] && this.board[1][1] === this.board[2][0]) )
     ) {
-      return this.board[1][1]
+      this.winner = this.board[1][1]
     }
 
     // check tie
-    if (this.board.join("").length === 15){
-      console.log(this.board.join(""))
-      return "tie"
+    if (this.board.join("").length === 15 && !this.winner){
+      this.winner = "tie"
     }
+    return this.winner;
   }
 
   //function take and validate input
@@ -74,76 +108,11 @@ function Game() {
 
 }
 
-function start(){
-  newGame = new Game();
-  $("td").text("");
-  $(".out").text("it is " + newGame.turn +"'s turn");
-}
 
+document.cookie = "username=sdfsdfsdfs Doe; expires=Thu, 18 Dec 2016 12:00:00 UTC; path=/";
+console.log(document.cookie)
 
 // ui
-$(function(){
-  //newgame (constructor), clear html fields
-
-  var newGame = new Game();
-
-  $("td").text("");
-
-  $(".out").text("it is " + newGame.turn +"'s turn");
-
-  $("td").click(function() {
-    //take and test input
-    if ( newGame.setBoard( parseInt($(this).parent().attr('class')), parseInt($(this).attr('class')) ) ) {
-      $(this).text(newGame.turn);
-      newGame.changeplayer();
-      $(".out").text("it is " + newGame.turn +"'s turn");
-    } else { $(".out").html("invalid input!!<br>it is " + newGame.turn +"'s turn");
-    }
-
-    // log board
-    // console.log(newGame.board[0]);
-    // console.log(newGame.board[1]);
-    // console.log(newGame.board[2]);
-
-
-    //test winner
-    if (newGame.testWinner() === "tie"){
-      $(".out").html("Nobody wins, new game!");
-      setTimeout(function(){
-        newGame = new Game();
-        $("td").text("");
-        $(".out").text("it is " + newGame.turn +"'s turn");
-      }, 1000);
-    } else if (newGame.testWinner()) {
-      // console.log("X wins")
-      $(".out").html(newGame.testWinner() + " wins, new game!");
-      setTimeout(function(){
-        newGame = new Game();
-        $("td").text("");
-        $(".out").text("it is " + newGame.turn +"'s turn");
-      }, 1000);
-    }
-  });
-
-  $("#new").click(function() {
-    newGame = new Game();
-    $("td").text("");
-    $(".out").text("it is " + newGame.turn +"'s turn");
-  });
-
-
-  $("#old").click(function() {
-    var oldGame = newGame;
-    $(".saved-games").append("<p class='old-game'>" + oldGame.board.join("") + "</p>");
-
-    $(".old-game").last().click(function() {
-      newGame = oldGame;
-      syncBoard(newGame.board);
-    });
-  });
-
-});
-
 function syncBoard(array) {
 
   for (var r = 0; r<array.length; r++){
@@ -153,3 +122,103 @@ function syncBoard(array) {
   }
 
 }
+
+$(function(){
+  //newgame (constructor), clear html fields
+
+  var newGame = new Game(2);
+
+  $("td").text("");
+
+  $(".out").text("it is " + newGame.turn +"'s turn");
+
+  $("td").click(function() {
+    //take and test input
+    if ( newGame.setBoard( parseInt($(this).parent().attr('class')), parseInt($(this).attr('class')) ) ) {
+      // $(this).text(newGame.turn);
+      newGame.changePlayer();
+      syncBoard(newGame.board);
+
+      var randomColor = '#'+Math.floor(Math.random()*16777215).toString(16);
+      $(this).css("background-color", randomColor);
+
+    } else { $(".out").html("invalid input!!<br>it is " + newGame.turn +"'s turn");
+    }
+
+
+    // log board
+    // console.log(newGame.board[0]);
+    // console.log(newGame.board[1]);
+    // console.log(newGame.board[2]);
+
+
+
+    //test if game over
+    if (newGame.testWinner()) {
+
+      // test how game ended
+      if (newGame.testWinner() === "tie") {
+        $(".out").html("Nobody wins, new game!");
+      } else {
+        $(".out").html(newGame.testWinner() + " wins, new game!");
+      }
+
+      // reset board, remove saved game if required
+      setTimeout(function(){
+        if (newGame.nameOfGame) {
+          console.log(newGame.nameOfGame);
+          $("p[value='" + newGame.nameOfGame + "']").remove();
+        }
+
+        newGame = new Game(2);
+        $("td").text("");
+        $(".out").text("it is " + newGame.turn +"'s turn");
+      }, 1000);
+    } else {
+      $(".out").text("it is " + newGame.turn +"'s turn");
+    }
+
+  });
+
+  //new one player game
+  $("#new1").click(function() {
+    newGame = new Game(1);
+    $("td").text("");
+    $(".out").text("it is " + newGame.turn +"'s turn");
+  });
+
+  //new two player game
+  $("#new2").click(function() {
+    newGame = new Game(2);
+    $("td").text("");
+    $(".out").text("it is " + newGame.turn +"'s turn");
+  });
+
+
+  $("#old").keypress(function(e) {
+
+    //detect enter key
+    var key = e.which
+    if (key == 13){
+      newGame.nameOfGame = $("#old").val();
+      // console.log(newGame.nameOfGame);
+
+      var oldGame = newGame;
+
+      $(".saved-games").append("<p class='old-game' value='" + newGame.nameOfGame + "'>" + newGame.nameOfGame + "</p>");
+
+      newGame = new Game(2);
+      $("td").text("");
+      $(".out").text("it is " + newGame.turn +"'s turn");
+
+      $(".old-game").last().click(function() {
+        newGame = oldGame;
+        syncBoard(newGame.board);
+        document.cookie = "username=John Doe; expires=Thu, 18 Dec 2019 12:00:00 UTC; path=/";
+        console.log(document.cookie)
+        $(".out").text("it is " + newGame.turn +"'s turn");
+      });
+    }
+  });
+
+});

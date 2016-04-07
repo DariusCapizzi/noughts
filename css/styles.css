@@ -15,9 +15,13 @@ table{
   font-size: 100px;
 }
 
-#new {
+#new2 {
   margin: 24px;
   font-size: 30px;
+}
+
+#new1 {
+  font-size: 15px;
 }
 
 div {
