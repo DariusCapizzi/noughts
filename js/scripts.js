@@ -5,9 +5,9 @@ function Game(player) {
   this.players = player;
   this.nameOfGame = "";
   this.winner = "";
-
+}
   // function change player, make computer move
-  this.changePlayer = function(){
+  Game.prototype.changePlayer = function(){
     if (this.players === 2) {
       if(this.turn === "x") {
         this.turn = "o";
@@ -23,25 +23,12 @@ function Game(player) {
           return;
         }
       }
-      //for each row
-
-      // for (var i=0;i<this.board.length;i++){
-      //   //for each column in that row
-      //   for (var k = 0 ; k<this.board[0].length; k++){
-      //     var randNumber = Math.random
-      //     if (!this.board[i][k]) {
-      //       this.board[i][k] = "o";
-      //       return;
-      //     }
-      //   }
-      //
-      // }
 
     }
   }
 
   //function test winner
-  this.testWinner = function(){
+  Game.prototype.testWinner = function(){
 
     //if someone already won
     if (this.winner) {
@@ -96,7 +83,7 @@ function Game(player) {
   }
 
   //function take and validate input
-  this.setBoard = function(row,col){
+  Game.prototype.setBoard = function(row,col){
 
     // if not an empty string
     if(!this.board[row][col]) {
@@ -106,17 +93,16 @@ function Game(player) {
     } else { return false; }
   }
 
-}
 
-
-document.cookie = "username=sdfsdfsdfs Doe; expires=Thu, 18 Dec 2016 12:00:00 UTC; path=/";
-console.log(document.cookie)
 
 // ui
 function syncBoard(array) {
 
+  //for every row
   for (var r = 0; r<array.length; r++){
+    //for every coloumn in that row
     for (var c = 0; c<array[0].length; c++ ){
+      //append table cell with inputted array index value
       $("tr." + c + " td." + r).text(array[c][r]);
     }
   }
@@ -125,11 +111,8 @@ function syncBoard(array) {
 
 $(function(){
   //newgame (constructor), clear html fields
-
   var newGame = new Game(2);
-
   $("td").text("");
-
   $(".out").text("it is " + newGame.turn +"'s turn");
 
   $("td").click(function() {
@@ -139,19 +122,16 @@ $(function(){
       newGame.changePlayer();
       syncBoard(newGame.board);
 
+      // set random color
       var randomColor = '#'+Math.floor(Math.random()*16777215).toString(16);
       $(this).css("background-color", randomColor);
 
-    } else { $(".out").html("invalid input!!<br>it is " + newGame.turn +"'s turn");
-    }
-
+    } else { $(".out").html("invalid input!!<br>it is " + newGame.turn +"'s turn"); }
 
     // log board
     // console.log(newGame.board[0]);
     // console.log(newGame.board[1]);
     // console.log(newGame.board[2]);
-
-
 
     //test if game over
     if (newGame.testWinner()) {
@@ -165,9 +145,11 @@ $(function(){
 
       // reset board, remove saved game if required
       setTimeout(function(){
+
+        //if saved game, remove its cookie and its
         if (newGame.nameOfGame) {
-          console.log(newGame.nameOfGame);
           $("p[value='" + newGame.nameOfGame + "']").remove();
+          $.removeCookie(newGame.nameOfGame);
         }
 
         newGame = new Game(2);
@@ -203,22 +185,48 @@ $(function(){
       newGame.nameOfGame = $("#old").val();
       // console.log(newGame.nameOfGame);
 
-      var oldGame = newGame;
+      //var oldGame = newGame;
 
       $(".saved-games").append("<p class='old-game' value='" + newGame.nameOfGame + "'>" + newGame.nameOfGame + "</p>");
+
+      var gameString = JSON.stringify(newGame)
+      $.cookie(newGame.nameOfGame, gameString);
 
       newGame = new Game(2);
       $("td").text("");
       $(".out").text("it is " + newGame.turn +"'s turn");
 
-      $(".old-game").last().click(function() {
-        newGame = oldGame;
+      $(".old-game").click(function() {
+
+        newGame = new Game();
+        var lastGame = JSON.parse($.cookie($(this).text()));
+        for (var i in lastGame){
+          console.log(newGame[i])
+          newGame[i] = lastGame[i];
+        }
+        console.log(newGame)
         syncBoard(newGame.board);
-        document.cookie = "username=John Doe; expires=Thu, 18 Dec 2019 12:00:00 UTC; path=/";
-        console.log(document.cookie)
-        $(".out").text("it is " + newGame.turn +"'s turn");
+
+        $(".out").text("it is " + newGame.turn + "'s turn");
       });
     }
+  });
+
+  for(var i in $.cookie()) {
+    console.log(i)
+    $(".saved-games").prepend("<p class='old-game' value='" + i + "'>" + i + "</p>");
+  }
+
+  $(".old-game").click(function() {
+
+    newGame = new Game();
+    var lastGame = JSON.parse($.cookie($(this).text()));
+    for (var i in lastGame){
+      newGame[i] = lastGame[i];
+    }
+    syncBoard(newGame.board);
+
+    $(".out").text("it is " + newGame.turn + "'s turn");
   });
 
 });
