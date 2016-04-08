@@ -96,6 +96,7 @@ function Game(player) {
 
 
 // ui
+
 function syncBoard(array) {
 
   //for every row
@@ -110,6 +111,8 @@ function syncBoard(array) {
 }
 
 $(function(){
+  $.cookie.defaults.expires = 365;
+  console.log($.cookie.defaults)
   //newgame (constructor), clear html fields
   var newGame = new Game(2);
   $("td").text("");
